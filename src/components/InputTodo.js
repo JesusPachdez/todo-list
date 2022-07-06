@@ -3,6 +3,7 @@ const InputTodo = ({ handleChange, handleClick, value }) => {
     <div
       style={{
         display: "flex",
+        justifyContent: "center",
         marginTop: 10,
       }}
     >

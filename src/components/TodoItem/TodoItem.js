@@ -1,11 +1,18 @@
 import PropTypes from "prop-types";
 import Image from "../../assets/icon-cross.svg";
-const TodoItem = ({ completed, title, handleCompleteTask, id }) => {
+const TodoItem = ({
+  completed,
+  title,
+  handleCompleteTask,
+  id,
+  handleDeleteTask,
+}) => {
   return (
     <div
       style={{
         display: "flex",
         alignItems: "center",
+        justifyContent: "center",
         padding: 10,
       }}
     >
@@ -38,6 +45,7 @@ const TodoItem = ({ completed, title, handleCompleteTask, id }) => {
         {title}
       </p>
       <img
+        onClick={() => handleDeleteTask(id)}
         src={Image}
         alt="cross"
         style={{ marginLeft: 50, cursor: "pointer" }}
