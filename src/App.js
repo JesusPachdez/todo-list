@@ -44,6 +44,11 @@ function App() {
     setTodos(newArray);
   };
 
+  const handleDeleteTask = (id) => {
+    const updateArray = todos.filter((todo) => todo.id !== id);
+    setTodos(updateArray);
+  };
+
   return (
     <>
       <InputTodo
@@ -62,6 +67,7 @@ function App() {
             title={todo.title}
             completed={todo.completed}
             handleCompleteTask={handleCompleteTask}
+            handleDeleteTask={handleDeleteTask}
           />
         );
       })}
