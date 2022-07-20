@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 function FilterTodos({ setStatus }) {
   const statusHandler = (e) => {
@@ -19,5 +20,9 @@ function FilterTodos({ setStatus }) {
     </div>
   );
 }
+
+FilterTodos.PropType = {
+  setStatus: PropTypes.string,
+};
 
 export default FilterTodos;

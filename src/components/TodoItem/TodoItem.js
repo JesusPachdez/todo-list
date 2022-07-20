@@ -58,6 +58,10 @@ const TodoItem = ({
 
 TodoItem.proptype = {
   completed: PropTypes.bool,
+  title: PropTypes.string,
+  handleCompleteTask: PropTypes.func,
+  id: PropTypes.number,
+  handleDeleteTask: PropTypes.func,
 };
 
 export default TodoItem;

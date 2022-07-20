@@ -5,20 +5,17 @@ import FilterTodos from "./components/FilterTodos";
 import { useState, useEffect } from "react";
 
 function App() {
-  // useState:
   const [value, setValue] = useState("");
   const [todos, setTodos] = useState([]);
   const [status, setStatus] = useState("all");
   const [filteredTodos, setFilteredTodos] = useState([]);
 
-  // Fetch-Function:
   const getData = async () => {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos");
     const data = await response.json();
     setTodos(data);
   };
 
-  // UseEffect:
   useEffect(() => {
     getData();
   }, []);
@@ -27,18 +24,22 @@ function App() {
     const filterHandler = () => {
       switch (status) {
         case "completed":
-          setFilteredTodos(todos.filter((todo) => todo.completed === true));
+          const completedTodos = todos.filter(
+            (todo) => todo.completed === true
+          );
+          setFilteredTodos(completedTodos);
           break;
         case "active":
-          setFilteredTodos(todos.filter((todo) => todo.completed === false));
+          const activeTodos = todos.filter((todo) => todo.completed === false);
+          setFilteredTodos(activeTodos);
           break;
         default:
-          setFilteredTodos(todos);
+          const allTodos = todos;
+          setFilteredTodos(allTodos);
           break;
       }
     };
 
-    //Functions:
     filterHandler();
   }, [status, todos]);
 
