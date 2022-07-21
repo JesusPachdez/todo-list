@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const InputTodo = ({ handleChange, handleClick, value }) => {
   return (
     <div
@@ -19,6 +21,12 @@ const InputTodo = ({ handleChange, handleClick, value }) => {
       />
     </div>
   );
+};
+
+InputTodo.PropType = {
+  handleChange: PropTypes.func,
+  handleClick: PropTypes.func,
+  value: PropTypes.string,
 };
 
 export default InputTodo;

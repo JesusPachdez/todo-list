@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import Image from "../../assets/icon-cross.svg";
+
 const TodoItem = ({
   completed,
   title,
@@ -39,6 +40,7 @@ const TodoItem = ({
           fontFamily: "-moz-initial",
           fontSize: "20px",
           textDecoration: completed ? "line-through" : " ",
+          opacity: completed ? "0.5" : "1",
           cursor: "pointer",
         }}
       >
@@ -56,6 +58,10 @@ const TodoItem = ({
 
 TodoItem.proptype = {
   completed: PropTypes.bool,
+  title: PropTypes.string,
+  handleCompleteTask: PropTypes.func,
+  id: PropTypes.number,
+  handleDeleteTask: PropTypes.func,
 };
 
 export default TodoItem;
