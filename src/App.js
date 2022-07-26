@@ -76,6 +76,11 @@ function App() {
     setTodos(updatedArray);
   };
 
+  const handleClearCompleted = () => {
+    const updatedTodos = todos.filter((todo) => todo.completed === false);
+    setTodos(updatedTodos);
+  };
+
   return (
     <div style={{ textAlign: "center" }}>
       <InputTodo
@@ -108,7 +113,11 @@ function App() {
         })}
       </div>
 
-      <FilterTodos setStatus={setStatus} />
+      <FilterTodos
+        setStatus={setStatus}
+        todos={todos}
+        handleClearCompleted={handleClearCompleted}
+      />
     </div>
   );
 }
