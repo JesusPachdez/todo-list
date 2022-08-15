@@ -1,6 +1,13 @@
 import PropTypes from "prop-types";
 
-const InputTodo = ({ handleChange, handleClick, value }) => {
+export default function InputTodo({
+  handleChange,
+  handleClick,
+  value,
+  handleSubmit,
+}) {
+  const isDisabled = value.length < 3;
+
   return (
     <div
       style={{
@@ -9,24 +16,25 @@ const InputTodo = ({ handleChange, handleClick, value }) => {
         marginTop: 10,
       }}
     >
-      <button onClick={handleClick}>Submit</button>
-
-      <input
-        id="new-todo-input"
-        placeholder="write a task"
-        type="text"
-        autoComplete="off"
-        onChange={handleChange}
-        value={value}
-      />
+      <form onSubmit={handleSubmit}>
+        <button onClick={handleClick} disabled={isDisabled}>
+          Submit
+        </button>
+        <input
+          id="new-todo-input"
+          placeholder="write a task"
+          type="text"
+          autoComplete="off"
+          onChange={handleChange}
+          value={value}
+        />
+      </form>
     </div>
   );
-};
+}
 
 InputTodo.PropType = {
   handleChange: PropTypes.func,
   handleClick: PropTypes.func,
   value: PropTypes.string,
 };
-
-export default InputTodo;
