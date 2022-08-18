@@ -1,11 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function InputTodo({
-  handleChange,
-  handleClick,
-  value,
-  handleSubmit,
-}) {
+export default function InputTodo({ handleChange, handleClick, value }) {
   const isDisabled = value.length < 3;
 
   return (
@@ -16,10 +11,11 @@ export default function InputTodo({
         marginTop: 10,
       }}
     >
-      <form onSubmit={handleSubmit}>
+      <form>
         <button onClick={handleClick} disabled={isDisabled}>
           Submit
         </button>
+
         <input
           id="new-todo-input"
           placeholder="write a task"

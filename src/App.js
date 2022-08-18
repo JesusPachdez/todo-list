@@ -2,7 +2,6 @@ import TodoItem from "./components/TodoItem/TodoItem";
 import InputTodo from "./components/InputTodo";
 import FilterTodos from "./components/FilterTodos";
 import Modal from "./components/Modal";
-import ModalTwo from "./components/ModalTwo";
 
 import { useState, useEffect, useRef } from "react";
 
@@ -11,18 +10,15 @@ export default function App() {
   const [todos, setTodos] = useState([]);
   const [status, setStatus] = useState("all");
   const [filteredTodos, setFilteredTodos] = useState([]);
-  const [openModal, setOpenModal] = useState({
-    message: "",
-    isLoading: false,
-  });
-  const [openModalTwo, setOpenModalTwo] = useState({
-    message: "",
-    isLoading: false,
+  const [modalStatus, setModalStatus] = useState({
+    isModalShown: false,
+    modalType: "",
   });
 
   const getData = async () => {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos");
     const data = await response.json();
+
     setTodos(data);
   };
 
@@ -37,15 +33,21 @@ export default function App() {
           const completedTodos = todos.filter(
             (todo) => todo.completed === true
           );
+
           setFilteredTodos(completedTodos);
+
           break;
         case "active":
           const activeTodos = todos.filter((todo) => todo.completed === false);
+
           setFilteredTodos(activeTodos);
+
           break;
         default:
           const allTodos = todos;
+
           setFilteredTodos(allTodos);
+
           break;
       }
     };
@@ -54,18 +56,7 @@ export default function App() {
   }, [status, todos]);
 
   const idProductRef = useRef();
-  const handleDialog = (message, isLoading) => {
-    setOpenModal({
-      message,
-      isLoading,
-    });
-  };
-  const handleDialogTwo = (message, isLoading) => {
-    setOpenModalTwo({
-      message,
-      isLoading,
-    });
-  };
+
   const handleChange = (e) => {
     setValue(e.target.value);
   };
@@ -95,47 +86,81 @@ export default function App() {
   };
 
   const handleDeleteTask = (id) => {
-    const deletedMessage = {
-      message: "Are you sure you want to delete this todo?",
-      isLoading: true,
-    };
-    setOpenModal(deletedMessage);
+    setModalStatus({
+      isModalShown: true,
+      modalType: "deleteTask",
+    });
+
     idProductRef.current = id;
   };
 
-  const handleConfirmDelete = (choose) => {
-    if (choose) {
+  const handleClearCompleted = () => {
+    setModalStatus({
+      isModalShown: true,
+      modalType: "clearCompleted",
+    });
+  };
+
+  const handleConfirmClearCompleted = (isConfirmed) => {
+    if (isConfirmed) {
+      const updatedTodos = todos.filter((todo) => todo.completed === false);
+
+      setTodos(updatedTodos);
+
+      setModalStatus({
+        isModalShown: false,
+        modalType: "",
+      });
+    } else {
+      setModalStatus({
+        isModalShown: false,
+        modalType: "",
+      });
+    }
+  };
+
+  const handleConfirmDeleteItem = (isConfirmed) => {
+    if (isConfirmed) {
       const updatedArray = todos.filter(
         (todo) => todo.id !== idProductRef.current
       );
+
       setTodos(updatedArray);
-      handleDialog("", false);
+      setModalStatus({
+        isModalShown: false,
+        modalType: "",
+      });
     } else {
-      handleDialog("", false);
+      setModalStatus({
+        isModalShown: false,
+        modalType: "",
+      });
     }
   };
 
-  const handleClearCompleted = () => {
-    const deletedMessage = {
-      message: "Are you sure you want to delete all the completed todos?",
-      isLoading: true,
-    };
-    setOpenModalTwo(deletedMessage);
+  const getModalHandler = (isConfirmed) => {
+    const { modalType } = modalStatus;
+
+    if (modalType === "deleteTask") return handleConfirmDeleteItem(isConfirmed);
+    if (modalType === "clearCompleted")
+      return handleConfirmClearCompleted(isConfirmed);
+
+    alert("There was an error on modal");
   };
 
-  const handleConfirmClearCompleted = (choose) => {
-    if (choose) {
-      const updatedTodos = todos.filter((todo) => todo.completed === false);
-      setTodos(updatedTodos);
-      handleDialogTwo("", false);
-    } else {
-      handleDialogTwo("", false);
-    }
+  const handleModalDialog = () => {
+    const { modalType } = modalStatus;
+
+    const deleteTodoMessage = "Are you sure you want to delete this todo?";
+    const clearTodosMessage =
+      "Are you sure you want to delete all completed todos?";
+
+    if (modalType === "deleteTask") return deleteTodoMessage;
+    if (modalType === "clearCompleted") return clearTodosMessage;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+  const { isModalShown } = modalStatus;
+  const message = handleModalDialog();
 
   return (
     <div style={{ textAlign: "center" }}>
@@ -143,8 +168,8 @@ export default function App() {
         value={value}
         handleChange={handleChange}
         handleClick={handleClick}
-        handleSubmit={handleSubmit}
       />
+
       <div
         style={{
           width: 500,
@@ -168,25 +193,16 @@ export default function App() {
             />
           );
         })}
-        {/* {filteredTodos.length === 0 && <p>OOPS your list is empty...</p>} */}
       </div>
+
       <FilterTodos
         setStatus={setStatus}
         filteredTodos={filteredTodos}
         handleClearCompleted={handleClearCompleted}
       />
-      {openModal.isLoading && (
-        <Modal
-          handleConfirmDelete={handleConfirmDelete}
-          message={openModal.message}
-        />
-      )}
 
-      {openModalTwo.isLoading && (
-        <ModalTwo
-          handleConfirmClearCompleted={handleConfirmClearCompleted}
-          message={openModalTwo.message}
-        />
+      {isModalShown && (
+        <Modal handleConfirmDelete={getModalHandler} message={message} />
       )}
     </div>
   );

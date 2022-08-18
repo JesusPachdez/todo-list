@@ -24,17 +24,21 @@ export default function FilterTodos({
       }}
     >
       <p style={{ paddingRight: 60 }}>{activeCount} items left</p>
+
       <div onClick={statusHandler}>
         <button value="all" type="button">
           All
         </button>
+
         <button value="completed" type="button">
           Completed
         </button>
+
         <button value="active" type="button">
           Active
         </button>
       </div>
+
       <p
         style={{ paddingLeft: 60, cursor: "pointer" }}
         onClick={handleClearCompleted}
@@ -47,4 +51,6 @@ export default function FilterTodos({
 
 FilterTodos.PropType = {
   setStatus: PropTypes.string,
+  filteredTodos: PropTypes.array,
+  handleClearCompleted: PropTypes.func,
 };

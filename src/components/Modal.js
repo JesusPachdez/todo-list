@@ -33,6 +33,7 @@ export default function Modal({ message, handleConfirmDelete }) {
         }}
       >
         <h2 style={{ color: "#c610d5" }}>{message}</h2>
+
         <footer style={{ display: "flex", alignItems: "center" }}>
           <button
             style={{
@@ -52,6 +53,7 @@ export default function Modal({ message, handleConfirmDelete }) {
           >
             Cancel
           </button>
+
           <button
             style={{
               background: "#950ba1",
