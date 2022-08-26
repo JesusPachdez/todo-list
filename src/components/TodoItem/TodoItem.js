@@ -1,13 +1,13 @@
 import PropTypes from "prop-types";
 import Image from "../../assets/icon-cross.svg";
 
-const TodoItem = ({
+export default function TodoItem({
   completed,
   title,
   handleCompleteTask,
   id,
   handleDeleteTask,
-}) => {
+}) {
   return (
     <div
       style={{
@@ -46,6 +46,7 @@ const TodoItem = ({
       >
         {title}
       </p>
+
       <img
         onClick={() => handleDeleteTask(id)}
         src={Image}
@@ -54,7 +55,7 @@ const TodoItem = ({
       />
     </div>
   );
-};
+}
 
 TodoItem.proptype = {
   completed: PropTypes.bool,
@@ -63,5 +64,3 @@ TodoItem.proptype = {
   id: PropTypes.number,
   handleDeleteTask: PropTypes.func,
 };
-
-export default TodoItem;

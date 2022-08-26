@@ -1,12 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-function FilterTodos({ setStatus, todos, handleClearCompleted }) {
+export default function FilterTodos({
+  setStatus,
+  filteredTodos,
+  handleClearCompleted,
+}) {
   const statusHandler = (e) => {
     setStatus(e.target.value);
   };
 
-  const activeCount = todos.filter((todo) => todo.completed === false).length;
+  const activeCount = filteredTodos.filter(
+    (todo) => todo.completed === false
+  ).length;
 
   return (
     <div
@@ -18,17 +24,21 @@ function FilterTodos({ setStatus, todos, handleClearCompleted }) {
       }}
     >
       <p style={{ paddingRight: 60 }}>{activeCount} items left</p>
+
       <div onClick={statusHandler}>
         <button value="all" type="button">
           All
         </button>
+
         <button value="completed" type="button">
           Completed
         </button>
+
         <button value="active" type="button">
           Active
         </button>
       </div>
+
       <p
         style={{ paddingLeft: 60, cursor: "pointer" }}
         onClick={handleClearCompleted}
@@ -41,6 +51,6 @@ function FilterTodos({ setStatus, todos, handleClearCompleted }) {
 
 FilterTodos.PropType = {
   setStatus: PropTypes.string,
+  filteredTodos: PropTypes.array,
+  handleClearCompleted: PropTypes.func,
 };
-
-export default FilterTodos;
