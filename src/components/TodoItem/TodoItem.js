@@ -7,6 +7,7 @@ export default function TodoItem({
   handleCompleteTask,
   id,
   handleDeleteTask,
+  scrollToRef,
 }) {
   return (
     <div
@@ -16,6 +17,7 @@ export default function TodoItem({
         justifyContent: "center",
         padding: 10,
       }}
+      ref={scrollToRef}
     >
       <div
         onClick={() => handleCompleteTask(id)}

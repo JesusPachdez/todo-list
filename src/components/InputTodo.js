@@ -12,7 +12,7 @@ export default function InputTodo({ handleChange, handleClick, value }) {
       }}
     >
       <form>
-        <button onClick={handleClick} disabled={isDisabled}>
+        <button type="submit" onClick={handleClick} disabled={isDisabled}>
           Submit
         </button>
 
@@ -21,6 +21,7 @@ export default function InputTodo({ handleChange, handleClick, value }) {
           placeholder="write a task"
           type="text"
           autoComplete="off"
+          maxLength={30}
           onChange={handleChange}
           value={value}
         />

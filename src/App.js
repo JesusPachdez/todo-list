@@ -61,7 +61,12 @@ export default function App() {
     setValue(e.target.value);
   };
 
-  const handleClick = () => {
+  const scrollToRef = useRef();
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    scrollToRef.current.scrollIntoView();
+
     const newTodo = {
       id: Date.now(),
       title: value,
@@ -72,6 +77,7 @@ export default function App() {
     const newArray = [newTodo, ...todos];
 
     setTodos(newArray);
+    setValue("");
   };
 
   const handleCompleteTask = (id) => {
@@ -190,6 +196,7 @@ export default function App() {
               completed={todo.completed}
               handleCompleteTask={handleCompleteTask}
               handleDeleteTask={handleDeleteTask}
+              scrollToRef={scrollToRef}
             />
           );
         })}
