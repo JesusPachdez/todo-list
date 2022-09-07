@@ -202,17 +202,17 @@ export default function App() {
             );
           })}
         </div>
-
-        <FilterTodos
-          setStatus={setStatus}
-          filteredTodos={filteredTodos}
-          handleClearCompleted={handleClearCompleted}
-        />
-
-        {isModalShown && (
-          <Modal handleConfirmDelete={getModalHandler} message={message} />
-        )}
       </div>
+
+      <FilterTodos
+        setStatus={setStatus}
+        filteredTodos={filteredTodos}
+        handleClearCompleted={handleClearCompleted}
+      />
+
+      {isModalShown && (
+        <Modal handleConfirmDelete={getModalHandler} message={message} />
+      )}
     </div>
   );
 }
