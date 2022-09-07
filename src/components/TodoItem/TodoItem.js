@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import Image from "../../assets/icon-cross.svg";
+import PropTypes from 'prop-types';
+import Image from '../../assets/icon-cross.svg';
 
 export default function TodoItem({
   completed,
@@ -7,43 +7,41 @@ export default function TodoItem({
   handleCompleteTask,
   id,
   handleDeleteTask,
-  scrollToRef,
 }) {
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: 10,
       }}
-      ref={scrollToRef}
     >
       <div
         onClick={() => handleCompleteTask(id)}
         style={{
           marginRight: 10,
-          justifyContent: "center",
+          justifyContent: 'center',
           width: 16,
           height: 16,
-          backgroundColor: completed ? "gray" : "white",
+          backgroundColor: completed ? 'gray' : 'white',
           borderWidth: 1,
-          borderStyle: "solid",
-          borderColor: "gray",
-          borderRadius: "50%",
-          cursor: "pointer",
+          borderStyle: 'solid',
+          borderColor: 'gray',
+          borderRadius: '50%',
+          cursor: 'pointer',
         }}
       />
 
       <p
         onClick={() => handleCompleteTask(id)}
         style={{
-          color: "black",
-          fontFamily: "-moz-initial",
-          fontSize: "20px",
-          textDecoration: completed ? "line-through" : " ",
-          opacity: completed ? "0.5" : "1",
-          cursor: "pointer",
+          color: 'black',
+          fontFamily: '-moz-initial',
+          fontSize: '20px',
+          textDecoration: completed ? 'line-through' : ' ',
+          opacity: completed ? '0.5' : '1',
+          cursor: 'pointer',
         }}
       >
         {title}
@@ -52,8 +50,8 @@ export default function TodoItem({
       <img
         onClick={() => handleDeleteTask(id)}
         src={Image}
-        alt="cross"
-        style={{ marginLeft: 50, cursor: "pointer" }}
+        alt='cross'
+        style={{ marginLeft: 50, cursor: 'pointer' }}
       />
     </div>
   );
