@@ -1,32 +1,27 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
+import { InputContainer, AddButton, Input } from './InputTodoStyled';
 
 export default function InputTodo({ handleChange, handleClick, value }) {
   const isDisabled = value.length < 3;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        marginTop: 10,
-      }}
-    >
+    <InputContainer>
       <form>
-        <button type="submit" onClick={handleClick} disabled={isDisabled}>
-          Submit
-        </button>
+        <AddButton type="submit" onClick={handleClick} disabled={isDisabled}>
+          Add
+        </AddButton>
 
-        <input
+        <Input
           id="new-todo-input"
-          placeholder="write a task"
+          placeholder="Type your next Task!"
           type="text"
           autoComplete="off"
-          maxLength={30}
+          maxLength={40}
           onChange={handleChange}
           value={value}
         />
       </form>
-    </div>
+    </InputContainer>
   );
 }
 

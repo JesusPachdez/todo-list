@@ -1,7 +1,15 @@
-import TodoItem from './components/TodoItem/TodoItem';
-import InputTodo from './components/InputTodo';
-import FilterTodos from './components/FilterTodos';
-import Modal from './components/Modal';
+import TodoItem from '../TodoItem/TodoItem';
+import InputTodo from '../InputTodo';
+import FilterTodos from '../FilterTodos';
+import Modal from '../Modal';
+import Image from '../../assets/bg-desktop-light.jpg';
+import {
+  AppContainer,
+  TodoListContainer,
+  Hero,
+  InputAndTodoListContainer,
+  Logo,
+} from './AppStyled';
 
 import { useState, useEffect, useRef } from 'react';
 
@@ -170,49 +178,47 @@ export default function App() {
   const message = handleModalDialog();
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <InputTodo
-        value={value}
-        handleChange={handleChange}
-        handleClick={handleClick}
-      />
+    <AppContainer>
+      <Hero src={Image} />
 
-      <div
-        style={{
-          width: 500,
-          height: 300,
-          overflow: 'scroll',
-          margin: 'auto',
-          marginTop: 20,
-        }}
-      >
-        <div ref={scrollToRef}>
-          {todos.length === 0 && <p>Loading your data...</p>}
+      <Logo>TODO</Logo>
 
-          {filteredTodos.map((todo) => {
-            return (
-              <TodoItem
-                key={todo.id}
-                id={todo.id}
-                title={todo.title}
-                completed={todo.completed}
-                handleCompleteTask={handleCompleteTask}
-                handleDeleteTask={handleDeleteTask}
-              />
-            );
-          })}
-        </div>
-      </div>
+      <InputAndTodoListContainer>
+        <InputTodo
+          value={value}
+          handleChange={handleChange}
+          handleClick={handleClick}
+        />
 
-      <FilterTodos
-        setStatus={setStatus}
-        filteredTodos={filteredTodos}
-        handleClearCompleted={handleClearCompleted}
-      />
+        <TodoListContainer>
+          <div ref={scrollToRef}>
+            {todos.length === 0 && <p>Loading your data...</p>}
+
+            {filteredTodos.map((todo) => {
+              return (
+                <TodoItem
+                  key={todo.id}
+                  id={todo.id}
+                  title={todo.title}
+                  completed={todo.completed}
+                  handleCompleteTask={handleCompleteTask}
+                  handleDeleteTask={handleDeleteTask}
+                />
+              );
+            })}
+          </div>
+        </TodoListContainer>
+
+        <FilterTodos
+          setStatus={setStatus}
+          filteredTodos={filteredTodos}
+          handleClearCompleted={handleClearCompleted}
+        />
+      </InputAndTodoListContainer>
 
       {isModalShown && (
         <Modal handleConfirmDelete={getModalHandler} message={message} />
       )}
-    </div>
+    </AppContainer>
   );
 }
