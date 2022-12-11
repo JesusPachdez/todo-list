@@ -18,10 +18,10 @@ export default function TodoItem({
     <TodoItemContainer>
       <TodoCheker
         onClick={() => handleCompleteTask(id)}
-        $completed={completed}
+        completed={completed}
       />
 
-      <TodoTitle onClick={() => handleCompleteTask(id)} $completed={completed}>
+      <TodoTitle onClick={() => handleCompleteTask(id)} completed={completed}>
         {title}
       </TodoTitle>
 
