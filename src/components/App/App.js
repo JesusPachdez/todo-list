@@ -1,8 +1,10 @@
+import { useState, useEffect, useRef } from 'react';
 import TodoItem from '../TodoItem/TodoItem';
 import InputTodo from '../InputTodo';
 import FilterTodos from '../FilterTodos';
 import Modal from '../Modal';
 import Image from '../../assets/bg-desktop-light.jpg';
+import PulseLoader from 'react-spinners/PulseLoader';
 import {
   AppContainer,
   TodoListContainer,
@@ -11,23 +13,42 @@ import {
   Logo,
 } from './AppStyled';
 
-import { useState, useEffect, useRef } from 'react';
-
 export default function App() {
   const [value, setValue] = useState('');
   const [todos, setTodos] = useState([]);
-  const [status, setStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [filteredTodos, setFilteredTodos] = useState([]);
   const [modalStatus, setModalStatus] = useState({
     isModalShown: false,
     modalType: '',
   });
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const getData = async () => {
-    const response = await fetch('https://jsonplaceholder.typicode.com/todos');
-    const data = await response.json();
+    try {
+      setLoading(true);
+      const response = await fetch(
+        'https://jsonplaceholder.typicode.com/todos'
+      );
+      const data = await response.json();
+      setTodos([]);
+      setLoading(false);
+    } catch (error) {
+      alert('there was an erro fetching information.');
+      console.log(error);
+      // if (error instanceof TypeError) {
+      //   console.log('Type error');
+      // }
 
-    setTodos(data);
+      // if (error instanceof SyntaxError) {
+      //   console.log('Syntax error');
+      // }
+
+      // if (error instanceof ReferenceError) {
+      //   console.log('Reference error');
+      // }
+    }
   };
 
   useEffect(() => {
@@ -36,7 +57,7 @@ export default function App() {
 
   useEffect(() => {
     const filterHandler = () => {
-      switch (status) {
+      switch (filterStatus) {
         case 'completed':
           const completedTodos = todos.filter(
             (todo) => todo.completed === true
@@ -61,12 +82,13 @@ export default function App() {
     };
 
     filterHandler();
-  }, [status, todos]);
+  }, [filterStatus, todos]);
 
   const idProductRef = useRef();
 
   const handleChange = (e) => {
     setValue(e.target.value);
+    setCount(e.target.value.length);
   };
 
   const scrollToRef = useRef();
@@ -177,47 +199,68 @@ export default function App() {
   const { isModalShown } = modalStatus;
   const message = handleModalDialog();
 
+  const handleMessageTodoListEmpty = () => {
+    const allListEmpty = `your to-do list is empty! now you can add your next task!`;
+    const completedListEmpty = `Congratulations! you don't have any pending tasks, you are up to date!`;
+    const activeListEmpty = `At the moment you don't have active tasks!`;
+
+    if (filterStatus === 'all' && todos.length === 0) return allListEmpty;
+    if (filterStatus === 'completed' && filteredTodos.length === 0)
+      return completedListEmpty;
+    if (filterStatus === 'active' && filteredTodos.length === 0)
+      return activeListEmpty;
+
+    return null;
+  };
+
+  const mesageTodoListEmpty = handleMessageTodoListEmpty();
   return (
     <AppContainer>
-      <Hero src={Image} />
+      {loading ? (
+        <PulseLoader color="#c610d5" size={25} />
+      ) : (
+        <>
+          <Hero src={Image} />
 
-      <Logo>TODO</Logo>
+          <Logo>TODO</Logo>
 
-      <InputAndTodoListContainer>
-        <InputTodo
-          value={value}
-          handleChange={handleChange}
-          handleClick={handleClick}
-        />
+          <InputAndTodoListContainer>
+            <InputTodo
+              value={value}
+              count={count}
+              handleChange={handleChange}
+              handleClick={handleClick}
+            />
+            <TodoListContainer>
+              <div ref={scrollToRef}>
+                {filteredTodos.map((todo) => {
+                  return (
+                    <TodoItem
+                      key={todo.id}
+                      id={todo.id}
+                      title={todo.title}
+                      completed={todo.completed}
+                      handleCompleteTask={handleCompleteTask}
+                      handleDeleteTask={handleDeleteTask}
+                    />
+                  );
+                })}
+              </div>
+              {mesageTodoListEmpty && <p>{mesageTodoListEmpty}</p>}
+            </TodoListContainer>
 
-        <TodoListContainer>
-          <div ref={scrollToRef}>
-            {todos.length === 0 && <p>Loading your data...</p>}
+            <FilterTodos
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+              filteredTodos={filteredTodos}
+              handleClearCompleted={handleClearCompleted}
+            />
+          </InputAndTodoListContainer>
 
-            {filteredTodos.map((todo) => {
-              return (
-                <TodoItem
-                  key={todo.id}
-                  id={todo.id}
-                  title={todo.title}
-                  completed={todo.completed}
-                  handleCompleteTask={handleCompleteTask}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            })}
-          </div>
-        </TodoListContainer>
-
-        <FilterTodos
-          setStatus={setStatus}
-          filteredTodos={filteredTodos}
-          handleClearCompleted={handleClearCompleted}
-        />
-      </InputAndTodoListContainer>
-
-      {isModalShown && (
-        <Modal handleConfirmDelete={getModalHandler} message={message} />
+          {isModalShown && (
+            <Modal handleConfirmDelete={getModalHandler} message={message} />
+          )}
+        </>
       )}
     </AppContainer>
   );
