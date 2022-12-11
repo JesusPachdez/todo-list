@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 import {
   FilterTodosContainer,
   ItemCounter,
-  Button,
+  FilterButton,
   ClearButton,
+  ButtonsContainer,
 } from './FilterTodosStyled';
 
 export default function FilterTodos({
-  setStatus,
+  filterStatus,
+  setFilterStatus,
   filteredTodos,
   handleClearCompleted,
 }) {
-  const statusHandler = (e) => {
-    setStatus(e.target.value);
+  const filterStatusHandler = (e) => {
+    setFilterStatus(e.target.value);
   };
 
   const activeCount = filteredTodos.filter(
@@ -24,19 +26,34 @@ export default function FilterTodos({
     <FilterTodosContainer>
       <ItemCounter>{activeCount} items left</ItemCounter>
 
-      <div onClick={statusHandler}>
-        <Button value="all" type="button">
+      <ButtonsContainer>
+        <FilterButton
+          onClick={filterStatusHandler}
+          isActive={filterStatus === 'all' ? true : false}
+          value="all"
+          type="button"
+        >
           All
-        </Button>
+        </FilterButton>
 
-        <Button value="completed" type="button">
+        <FilterButton
+          onClick={filterStatusHandler}
+          isActive={filterStatus === 'completed' ? true : false}
+          value="completed"
+          type="button"
+        >
           Completed
-        </Button>
+        </FilterButton>
 
-        <Button value="active" type="button">
+        <FilterButton
+          onClick={filterStatusHandler}
+          isActive={filterStatus === 'active' ? true : false}
+          value="active"
+          type="button"
+        >
           Active
-        </Button>
-      </div>
+        </FilterButton>
+      </ButtonsContainer>
 
       <ClearButton onClick={handleClearCompleted}>Clear completed</ClearButton>
     </FilterTodosContainer>
@@ -44,7 +61,7 @@ export default function FilterTodos({
 }
 
 FilterTodos.PropType = {
-  setStatus: PropTypes.string,
+  setFilterStatus: PropTypes.string,
   filteredTodos: PropTypes.array,
   handleClearCompleted: PropTypes.func,
 };

@@ -1,12 +1,18 @@
 import PropTypes from 'prop-types';
-import { InputContainer, AddButton, Input } from './InputTodoStyled';
+import {
+  InputContainer,
+  AddButton,
+  Input,
+  Form,
+  CharCounter,
+} from './InputTodoStyled';
 
-export default function InputTodo({ handleChange, handleClick, value }) {
+export default function InputTodo({ handleChange, handleClick, value, count }) {
   const isDisabled = value.length < 3;
 
   return (
     <InputContainer>
-      <form>
+      <Form>
         <AddButton type="submit" onClick={handleClick} disabled={isDisabled}>
           Add
         </AddButton>
@@ -16,11 +22,12 @@ export default function InputTodo({ handleChange, handleClick, value }) {
           placeholder="Type your next Task!"
           type="text"
           autoComplete="off"
-          maxLength={40}
+          maxLength={30}
           onChange={handleChange}
           value={value}
         />
-      </form>
+      </Form>
+      <CharCounter count={count}>{count} /30</CharCounter>
     </InputContainer>
   );
 }
@@ -29,4 +36,5 @@ InputTodo.PropType = {
   handleChange: PropTypes.func,
   handleClick: PropTypes.func,
   value: PropTypes.string,
+  count: PropTypes.number,
 };
