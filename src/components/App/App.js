@@ -5,6 +5,7 @@ import FilterTodos from '../FilterTodos';
 import Modal from '../Modal';
 import Image from '../../assets/bg-desktop-light.jpg';
 import PulseLoader from 'react-spinners/PulseLoader';
+import apiHandler from '../../api';
 import {
   AppContainer,
   TodoListContainer,
@@ -26,29 +27,16 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const getData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        'https://jsonplaceholder.typicode.com/todos'
-      );
-      const data = await response.json();
-      setTodos([]);
-      setLoading(false);
-    } catch (error) {
-      alert('there was an erro fetching information.');
-      console.log(error);
-      // if (error instanceof TypeError) {
-      //   console.log('Type error');
-      // }
+    setLoading(true);
+    const response = await apiHandler({
+      endpoint: 'todos',
+      method: 'GET',
+    });
 
-      // if (error instanceof SyntaxError) {
-      //   console.log('Syntax error');
-      // }
+    if (response.isError) return setTodos([]);
 
-      // if (error instanceof ReferenceError) {
-      //   console.log('Reference error');
-      // }
-    }
+    setTodos(response);
+    setLoading(false);
   };
 
   useEffect(() => {
