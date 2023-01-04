@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import {
   FilterTodosContainer,
   ItemCounter,
@@ -8,6 +9,12 @@ import {
   ButtonsContainer,
 } from './FilterTodosStyled';
 
+const FILTER_STATUS = {
+  ACTIVE: 'active',
+  ALL: 'all',
+  COMPLETED: 'completed',
+};
+
 export default function FilterTodos({
   filterStatus,
   setFilterStatus,
@@ -15,12 +22,12 @@ export default function FilterTodos({
   handleClearCompleted,
 }) {
   const filterStatusHandler = (e) => {
-    setFilterStatus(e.target.value);
+    const filterValue = e.target.value;
+
+    setFilterStatus(filterValue);
   };
 
-  const activeCount = filteredTodos.filter(
-    (todo) => todo.completed === false
-  ).length;
+  const activeCount = filteredTodos.filter((todo) => !todo.completed)?.length;
 
   return (
     <FilterTodosContainer>
@@ -29,27 +36,27 @@ export default function FilterTodos({
       <ButtonsContainer>
         <FilterButton
           onClick={filterStatusHandler}
-          isActive={filterStatus === 'all' ? true : false}
-          value="all"
-          type="button"
+          isActive={filterStatus === FILTER_STATUS.ALL ? true : false}
+          value='all'
+          type='button'
         >
           All
         </FilterButton>
 
         <FilterButton
           onClick={filterStatusHandler}
-          isActive={filterStatus === 'completed' ? true : false}
-          value="completed"
-          type="button"
+          isActive={filterStatus === FILTER_STATUS.COMPLETED ? true : false}
+          value='completed'
+          type='button'
         >
           Completed
         </FilterButton>
 
         <FilterButton
           onClick={filterStatusHandler}
-          isActive={filterStatus === 'active' ? true : false}
-          value="active"
-          type="button"
+          isActive={filterStatus === FILTER_STATUS.ACTIVE ? true : false}
+          value='active'
+          type='button'
         >
           Active
         </FilterButton>

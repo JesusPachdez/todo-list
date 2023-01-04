@@ -27,6 +27,7 @@ export const ModalContainer = styled.div`
 export const ModalMessage = styled.h2`
   color: #c610d5;
 `;
+
 export const ModalFooter = styled.footer`
   display: flex;
   align-items: center;

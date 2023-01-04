@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import PulseLoader from 'react-spinners/PulseLoader';
+
 import TodoItem from '../TodoItem/TodoItem';
 import InputTodo from '../InputTodo';
 import FilterTodos from '../FilterTodos';
 import Modal from '../Modal';
-import Image from '../../assets/bg-desktop-light.jpg';
-import PulseLoader from 'react-spinners/PulseLoader';
+
 import apiHandler from '../../api';
+import { handleMessageTodoListEmpty, handleModalDialog } from './helpers';
+
+import Image from '../../assets/bg-desktop-light.jpg';
+
 import {
   AppContainer,
   TodoListContainer,
@@ -28,6 +33,7 @@ export default function App() {
 
   const getData = async () => {
     setLoading(true);
+
     const response = await apiHandler({
       endpoint: 'todos',
       method: 'GET',
@@ -35,8 +41,10 @@ export default function App() {
 
     if (response.isError) return setTodos([]);
 
-    setTodos(response);
-    setLoading(false);
+    setTimeout(() => {
+      setTodos([]);
+      setLoading(false);
+    }, 2000);
   };
 
   useEffect(() => {
@@ -74,16 +82,14 @@ export default function App() {
 
   const idProductRef = useRef();
 
-  const handleChange = (e) => {
+  const handleChangeText = (e) => {
     setValue(e.target.value);
     setCount(e.target.value.length);
   };
 
   const scrollToRef = useRef();
 
-  const handleClick = (e) => {
-    e.preventDefault();
-
+  const handleAddTask = () => {
     scrollToRef.current.scrollIntoView();
 
     const newTodo = {
@@ -93,21 +99,21 @@ export default function App() {
       creationDate: Date.now(),
     };
 
-    const newArray = [newTodo, ...todos];
+    const newTodoList = [newTodo, ...todos];
 
-    setTodos(newArray);
+    setTodos(newTodoList);
     setValue('');
   };
 
   const handleCompleteTask = (id) => {
-    const newArray = todos.map((todo) => {
+    const filteredTodos = todos.map((todo) => {
       return {
         ...todo,
         completed: todo.id === id ? !todo.completed : todo.completed,
       };
     });
 
-    setTodos(newArray);
+    setTodos(filteredTodos);
   };
 
   const handleDeleteTask = (id) => {
@@ -127,128 +133,117 @@ export default function App() {
   };
 
   const handleConfirmClearCompleted = (isConfirmed) => {
-    if (isConfirmed) {
-      const updatedTodos = todos.filter((todo) => todo.completed === false);
-
-      setTodos(updatedTodos);
-
-      setModalStatus({
+    if (!isConfirmed)
+      return setModalStatus({
         isModalShown: false,
         modalType: '',
       });
-    } else {
-      setModalStatus({
-        isModalShown: false,
-        modalType: '',
-      });
-    }
+
+    ////**BOOMER
+    // const updatedTodos = todos.filter((todo) => todo.completed === false);
+
+    ////**NICE :D
+    const updatedTodos = todos.filter((todo) => !todo.completed);
+    setTodos(updatedTodos);
+
+    setModalStatus({
+      isModalShown: false,
+      modalType: '',
+    });
   };
 
   const handleConfirmDeleteItem = (isConfirmed) => {
-    if (isConfirmed) {
-      const updatedArray = todos.filter(
-        (todo) => todo.id !== idProductRef.current
-      );
+    if (!isConfirmed)
+      return setModalStatus({
+        isModalShown: false,
+        modalType: '',
+      });
 
-      setTodos(updatedArray);
-      setModalStatus({
-        isModalShown: false,
-        modalType: '',
-      });
-    } else {
-      setModalStatus({
-        isModalShown: false,
-        modalType: '',
-      });
-    }
+    const updatedArray = todos.filter(
+      (todo) => todo.id !== idProductRef.current
+    );
+
+    setTodos(updatedArray);
+
+    setModalStatus({
+      isModalShown: false,
+      modalType: '',
+    });
   };
 
   const getModalHandler = (isConfirmed) => {
     const { modalType } = modalStatus;
 
     if (modalType === 'deleteTask') return handleConfirmDeleteItem(isConfirmed);
+
     if (modalType === 'clearCompleted')
       return handleConfirmClearCompleted(isConfirmed);
 
     alert('There was an error on modal');
   };
 
-  const handleModalDialog = () => {
-    const { modalType } = modalStatus;
-
-    const deleteTodoMessage = 'Are you sure you want to delete this todo?';
-    const clearTodosMessage =
-      'Are you sure you want to delete all completed todos?';
-
-    if (modalType === 'deleteTask') return deleteTodoMessage;
-    if (modalType === 'clearCompleted') return clearTodosMessage;
-  };
-
   const { isModalShown } = modalStatus;
-  const message = handleModalDialog();
+  const message = handleModalDialog(modalStatus);
 
-  const handleMessageTodoListEmpty = () => {
-    const allListEmpty = `your to-do list is empty! now you can add your next task!`;
-    const completedListEmpty = `Congratulations! you don't have any pending tasks, you are up to date!`;
-    const activeListEmpty = `At the moment you don't have active tasks!`;
+  const _renderTodoItems = () => {
+    const todosLength = todos.length;
+    const filteredTodosLength = filteredTodos.length;
 
-    if (filterStatus === 'all' && todos.length === 0) return allListEmpty;
-    if (filterStatus === 'completed' && filteredTodos.length === 0)
-      return completedListEmpty;
-    if (filterStatus === 'active' && filteredTodos.length === 0)
-      return activeListEmpty;
+    const emptyTodoListMsg = handleMessageTodoListEmpty(
+      todosLength,
+      filteredTodosLength,
+      filterStatus
+    );
 
-    return null;
+    return (
+      <div ref={scrollToRef}>
+        {filteredTodos.map((todo) => {
+          return (
+            <TodoItem
+              key={todo.id}
+              id={todo.id}
+              title={todo.title}
+              completed={todo.completed}
+              handleCompleteTask={handleCompleteTask}
+              handleDeleteTask={handleDeleteTask}
+            />
+          );
+        })}
+
+        {emptyTodoListMsg && <p>{emptyTodoListMsg}</p>}
+      </div>
+    );
   };
 
-  const mesageTodoListEmpty = handleMessageTodoListEmpty();
   return (
     <AppContainer>
-      {loading ? (
-        <PulseLoader color="#c610d5" size={25} />
-      ) : (
-        <>
-          <Hero src={Image} />
+      <Hero src={Image} />
+      <Logo>TODO</Logo>
 
-          <Logo>TODO</Logo>
+      {loading && <PulseLoader color='#c610d5' size={25} />}
 
-          <InputAndTodoListContainer>
-            <InputTodo
-              value={value}
-              count={count}
-              handleChange={handleChange}
-              handleClick={handleClick}
-            />
-            <TodoListContainer>
-              <div ref={scrollToRef}>
-                {filteredTodos.map((todo) => {
-                  return (
-                    <TodoItem
-                      key={todo.id}
-                      id={todo.id}
-                      title={todo.title}
-                      completed={todo.completed}
-                      handleCompleteTask={handleCompleteTask}
-                      handleDeleteTask={handleDeleteTask}
-                    />
-                  );
-                })}
-              </div>
-              {mesageTodoListEmpty && <p>{mesageTodoListEmpty}</p>}
-            </TodoListContainer>
+      {!loading && (
+        <InputAndTodoListContainer>
+          <InputTodo
+            textValue={value}
+            count={count}
+            handleChangeText={handleChangeText}
+            handleAddTask={handleAddTask}
+          />
 
-            <FilterTodos
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              filteredTodos={filteredTodos}
-              handleClearCompleted={handleClearCompleted}
-            />
-          </InputAndTodoListContainer>
+          <TodoListContainer>{_renderTodoItems()}</TodoListContainer>
 
-          {isModalShown && (
-            <Modal handleConfirmDelete={getModalHandler} message={message} />
-          )}
-        </>
+          <FilterTodos
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            filteredTodos={filteredTodos}
+            handleClearCompleted={handleClearCompleted}
+          />
+        </InputAndTodoListContainer>
+      )}
+
+      {isModalShown && (
+        <Modal handleConfirmDelete={getModalHandler} message={message} />
       )}
     </AppContainer>
   );
