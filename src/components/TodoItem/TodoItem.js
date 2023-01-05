@@ -1,22 +1,23 @@
 import PropTypes from 'prop-types';
+
 import Image from '../../assets/icon-cross.svg';
 import {
   TodoItemContainer,
-  TodoCheker,
+  TodoChecker,
   TodoTitle,
   CrossImg,
 } from './TodoItemStyled';
 
 export default function TodoItem({
-  completed,
-  title,
-  handleCompleteTask,
   id,
+  title,
+  completed,
+  handleCompleteTask,
   handleDeleteTask,
 }) {
   return (
     <TodoItemContainer>
-      <TodoCheker
+      <TodoChecker
         onClick={() => handleCompleteTask(id)}
         completed={completed}
       />
@@ -25,7 +26,7 @@ export default function TodoItem({
         {title}
       </TodoTitle>
 
-      <CrossImg onClick={() => handleDeleteTask(id)} src={Image} alt="cross" />
+      <CrossImg onClick={() => handleDeleteTask(id)} src={Image} alt='cross' />
     </TodoItemContainer>
   );
 }

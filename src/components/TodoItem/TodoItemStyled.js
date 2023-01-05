@@ -21,7 +21,7 @@ export const TodoItemContainer = styled.div`
   }
 `;
 
-export const TodoCheker = styled.div`
+export const TodoChecker = styled.div`
   ${({ completed }) => ({
     justifyContent: 'center',
     width: 20,
