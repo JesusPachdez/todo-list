@@ -39,12 +39,17 @@ export default function App() {
       method: 'GET',
     });
 
-    if (response.isError) return setTodos([]);
-
-    setTimeout(() => {
+    if (response.isError) {
       setTodos([]);
       setLoading(false);
-    }, 2000);
+      return;
+    }
+
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      setTodos(response || []);
+      setLoading(false);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -89,31 +94,59 @@ export default function App() {
 
   const scrollToRef = useRef();
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
+    if (!value.trim()) return;
+
     scrollToRef.current.scrollIntoView();
 
     const newTodo = {
-      id: Date.now(),
       title: value,
       completed: false,
       creationDate: Date.now(),
     };
 
-    const newTodoList = [newTodo, ...todos];
+    try {
+      const response = await apiHandler({
+        endpoint: 'todos',
+        method: 'POST',
+        body: newTodo,
+      });
 
-    setTodos(newTodoList);
-    setValue('');
+      if (!response.isError) {
+        const newTodoList = [response, ...todos];
+        setTodos(newTodoList);
+        setValue('');
+      }
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
-  const handleCompleteTask = (id) => {
-    const filteredTodos = todos.map((todo) => {
-      return {
-        ...todo,
-        completed: todo.id === id ? !todo.completed : todo.completed,
-      };
-    });
+  const handleCompleteTask = async (id) => {
+    const todoToUpdate = todos.find((todo) => todo.id === id);
+    if (!todoToUpdate) return;
 
-    setTodos(filteredTodos);
+    const updatedTodo = {
+      ...todoToUpdate,
+      completed: !todoToUpdate.completed,
+    };
+
+    try {
+      const response = await apiHandler({
+        endpoint: `todos/${id}`,
+        method: 'PUT',
+        body: updatedTodo,
+      });
+
+      if (!response.isError) {
+        const filteredTodos = todos.map((todo) => {
+          return todo.id === id ? response : todo;
+        });
+        setTodos(filteredTodos);
+      }
+    } catch (error) {
+      console.error('Error updating todo:', error);
+    }
   };
 
   const handleDeleteTask = (id) => {
@@ -132,19 +165,32 @@ export default function App() {
     });
   };
 
-  const handleConfirmClearCompleted = (isConfirmed) => {
+  const handleConfirmClearCompleted = async (isConfirmed) => {
     if (!isConfirmed)
       return setModalStatus({
         isModalShown: false,
         modalType: '',
       });
 
-    ////**BOOMER
-    // const updatedTodos = todos.filter((todo) => todo.completed === false);
+    const completedTodos = todos.filter((todo) => todo.completed);
 
-    ////**NICE :D
-    const updatedTodos = todos.filter((todo) => !todo.completed);
-    setTodos(updatedTodos);
+    try {
+      // Delete all completed todos from server
+      const deletePromises = completedTodos.map((todo) =>
+        apiHandler({
+          endpoint: `todos/${todo.id}`,
+          method: 'DELETE',
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      // Update local state
+      const updatedTodos = todos.filter((todo) => !todo.completed);
+      setTodos(updatedTodos);
+    } catch (error) {
+      console.error('Error clearing completed todos:', error);
+    }
 
     setModalStatus({
       isModalShown: false,
@@ -152,18 +198,28 @@ export default function App() {
     });
   };
 
-  const handleConfirmDeleteItem = (isConfirmed) => {
+  const handleConfirmDeleteItem = async (isConfirmed) => {
     if (!isConfirmed)
       return setModalStatus({
         isModalShown: false,
         modalType: '',
       });
 
-    const updatedArray = todos.filter(
-      (todo) => todo.id !== idProductRef.current
-    );
+    const todoId = idProductRef.current;
 
-    setTodos(updatedArray);
+    try {
+      const response = await apiHandler({
+        endpoint: `todos/${todoId}`,
+        method: 'DELETE',
+      });
+
+      if (!response.isError) {
+        const updatedArray = todos.filter((todo) => todo.id !== todoId);
+        setTodos(updatedArray);
+      }
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
 
     setModalStatus({
       isModalShown: false,
@@ -220,7 +276,7 @@ export default function App() {
       <Hero src={Image} />
       <Logo>TODO</Logo>
 
-      {loading && <PulseLoader color='#c610d5' size={25} />}
+      {loading && <PulseLoader color="#c610d5" size={25} />}
 
       {!loading && (
         <InputAndTodoListContainer>

@@ -1,8 +1,19 @@
-const apiUrl = 'https://jsonplaceholder.typicode.com';
+const apiUrl = 'http://localhost:3001';
 
-export default async function apiHandler({ endpoint, method }) {
+export default async function apiHandler({ endpoint, method, body }) {
   try {
-    const response = await fetch(`${apiUrl}/${endpoint}`, { method });
+    const config = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (body) {
+      config.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(`${apiUrl}/${endpoint}`, config);
 
     if (response.status === 404)
       return {
@@ -15,5 +26,10 @@ export default async function apiHandler({ endpoint, method }) {
     return data;
   } catch (error) {
     console.log('apiHandler - error', error);
+    return {
+      status: 500,
+      message: 'Network error or server unavailable',
+      isError: true,
+    };
   }
 }

@@ -1,0 +1,22 @@
+{
+  "todos": [
+    {
+      "id": "1",
+      "title": "Complete project documentation",
+      "completed": false,
+      "creationDate": 1640995200000
+    },
+    {
+      "id": "2",
+      "title": "Review code changes",
+      "completed": false,
+      "creationDate": 1640995260000
+    },
+    {
+      "id": "3",
+      "title": "Set up local development environment",
+      "completed": false,
+      "creationDate": 1640995320000
+    }
+  ]
+}
