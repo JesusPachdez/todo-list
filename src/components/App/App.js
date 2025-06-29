@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import PulseLoader from 'react-spinners/PulseLoader';
 
 import TodoItem from '../TodoItem/TodoItem';
@@ -6,7 +6,7 @@ import InputTodo from '../InputTodo';
 import FilterTodos from '../FilterTodos';
 import Modal from '../Modal';
 
-import apiHandler from '../../api';
+import { useTodos } from '../../hooks/useTodos';
 import { handleMessageTodoListEmpty, handleModalDialog } from './helpers';
 
 import Image from '../../assets/bg-desktop-light.jpg';
@@ -21,75 +21,41 @@ import {
 
 export default function App() {
   const [value, setValue] = useState('');
-  const [todos, setTodos] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filteredTodos, setFilteredTodos] = useState([]);
   const [modalStatus, setModalStatus] = useState({
     isModalShown: false,
     modalType: '',
   });
-  const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
 
-  const getData = async () => {
-    setLoading(true);
+  // Use custom hook for todo management
+  const {
+    todos,
+    loading,
+    addTodo,
+    updateTodo,
+    deleteTodo,
+    clearCompletedTodos,
+  } = useTodos();
 
-    const response = await apiHandler({
-      endpoint: 'todos',
-      method: 'GET',
-    });
+  // Derive count from value
+  const count = value.length;
 
-    if (response.isError) {
-      setTodos([]);
-      setLoading(false);
-      return;
+  // Memoize filtered todos for performance
+  const filteredTodos = useMemo(() => {
+    switch (filterStatus) {
+      case 'completed':
+        return todos.filter((todo) => todo.completed === true);
+      case 'active':
+        return todos.filter((todo) => todo.completed === false);
+      default:
+        return todos;
     }
-
-    // Simulate loading delay for better UX
-    setTimeout(() => {
-      setTodos(response || []);
-      setLoading(false);
-    }, 1000);
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  useEffect(() => {
-    const filterHandler = () => {
-      switch (filterStatus) {
-        case 'completed':
-          const completedTodos = todos.filter(
-            (todo) => todo.completed === true
-          );
-
-          setFilteredTodos(completedTodos);
-
-          break;
-        case 'active':
-          const activeTodos = todos.filter((todo) => todo.completed === false);
-
-          setFilteredTodos(activeTodos);
-
-          break;
-        default:
-          const allTodos = todos;
-
-          setFilteredTodos(allTodos);
-
-          break;
-      }
-    };
-
-    filterHandler();
-  }, [filterStatus, todos]);
+  }, [todos, filterStatus]);
 
   const idProductRef = useRef();
 
   const handleChangeText = (e) => {
     setValue(e.target.value);
-    setCount(e.target.value.length);
   };
 
   const scrollToRef = useRef();
@@ -105,48 +71,14 @@ export default function App() {
       creationDate: Date.now(),
     };
 
-    try {
-      const response = await apiHandler({
-        endpoint: 'todos',
-        method: 'POST',
-        body: newTodo,
-      });
-
-      if (!response.isError) {
-        const newTodoList = [response, ...todos];
-        setTodos(newTodoList);
-        setValue('');
-      }
-    } catch (error) {
-      console.error('Error adding todo:', error);
+    const result = await addTodo(newTodo);
+    if (result.success) {
+      setValue('');
     }
   };
 
   const handleCompleteTask = async (id) => {
-    const todoToUpdate = todos.find((todo) => todo.id === id);
-    if (!todoToUpdate) return;
-
-    const updatedTodo = {
-      ...todoToUpdate,
-      completed: !todoToUpdate.completed,
-    };
-
-    try {
-      const response = await apiHandler({
-        endpoint: `todos/${id}`,
-        method: 'PUT',
-        body: updatedTodo,
-      });
-
-      if (!response.isError) {
-        const filteredTodos = todos.map((todo) => {
-          return todo.id === id ? response : todo;
-        });
-        setTodos(filteredTodos);
-      }
-    } catch (error) {
-      console.error('Error updating todo:', error);
-    }
+    await updateTodo(id);
   };
 
   const handleDeleteTask = (id) => {
@@ -172,25 +104,7 @@ export default function App() {
         modalType: '',
       });
 
-    const completedTodos = todos.filter((todo) => todo.completed);
-
-    try {
-      // Delete all completed todos from server
-      const deletePromises = completedTodos.map((todo) =>
-        apiHandler({
-          endpoint: `todos/${todo.id}`,
-          method: 'DELETE',
-        })
-      );
-
-      await Promise.all(deletePromises);
-
-      // Update local state
-      const updatedTodos = todos.filter((todo) => !todo.completed);
-      setTodos(updatedTodos);
-    } catch (error) {
-      console.error('Error clearing completed todos:', error);
-    }
+    await clearCompletedTodos();
 
     setModalStatus({
       isModalShown: false,
@@ -206,20 +120,7 @@ export default function App() {
       });
 
     const todoId = idProductRef.current;
-
-    try {
-      const response = await apiHandler({
-        endpoint: `todos/${todoId}`,
-        method: 'DELETE',
-      });
-
-      if (!response.isError) {
-        const updatedArray = todos.filter((todo) => todo.id !== todoId);
-        setTodos(updatedArray);
-      }
-    } catch (error) {
-      console.error('Error deleting todo:', error);
-    }
+    await deleteTodo(todoId);
 
     setModalStatus({
       isModalShown: false,
